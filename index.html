@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Civilized Pool</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4efe7;
+      --bg-accent: #d7e3da;
+      --panel: rgba(255, 255, 255, 0.82);
+      --text: #1f2a2e;
+      --muted: #56636a;
+      --accent: #0f5f4e;
+      --accent-strong: #0a4639;
+      --border: rgba(31, 42, 46, 0.12);
+      --shadow: 0 24px 70px rgba(31, 42, 46, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family: Georgia, "Times New Roman", Times, serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.92), transparent 32%),
+        radial-gradient(circle at 80% 20%, rgba(15, 95, 78, 0.15), transparent 30%),
+        linear-gradient(145deg, var(--bg), var(--bg-accent));
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-size: 36px 36px;
+      mask-image: radial-gradient(circle at center, black, transparent 88%);
+      opacity: 0.5;
+    }
+
+    main {
+      width: min(640px, 100%);
+      position: relative;
+      z-index: 1;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: clamp(28px, 6vw, 48px);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .kicker {
+      margin: 0 0 12px;
+      font-family: Arial, Helvetica, sans-serif;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-size: 0.74rem;
+      color: var(--accent);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 6vw, 4.6rem);
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+    }
+
+    .lead {
+      margin: 18px 0 0;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: clamp(1.05rem, 2.7vw, 1.2rem);
+      line-height: 1.55;
+      color: var(--muted);
+      max-width: 34rem;
+    }
+
+    .action {
+      margin-top: 28px;
+      display: none;
+    }
+
+    .action.is-visible {
+      display: block;
+      animation: fade-up 180ms ease-out;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0.85rem 1.25rem;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(15, 95, 78, 0.18);
+      transition: transform 120ms ease, background 120ms ease;
+    }
+
+    .button:hover,
+    .button:focus-visible {
+      transform: translateY(-1px);
+      background: var(--accent-strong);
+    }
+
+    .note {
+      margin: 16px 0 0;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    @keyframes fade-up {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 560px) {
+      body {
+        padding: 16px;
+      }
+
+      .card {
+        border-radius: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card" aria-live="polite">
+      <p class="kicker">Civilized Pool</p>
+      <h1 id="page-title">Finding this week's tournament...</h1>
+      <p class="lead" id="page-lead">Please wait while we look up the current Rodder's tournament signup link.</p>
+      <div class="action" id="page-action"></div>
+      <p class="note" id="page-note"></p>
+    </section>
+  </main>
+  <script src="redirect.js"></script>
+</body>
+</html>

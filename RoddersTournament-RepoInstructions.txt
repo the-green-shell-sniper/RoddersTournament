@@ -1,0 +1,516 @@
+I need you to build a brand-new GitHub Pages site in this repository whose primary purpose is to redirect CivilizedPool.com to the correct current Rodder's tournament signup page on DigitalPool.
+
+IMPORTANT REPOSITORY RULE:
+There is a folder in this repo named:
+
+2026-08-26_RiverTournamentClone
+
+That folder contains files cloned from an older River Tournaments website ONLY as historical/reference material.
+
+DO NOT:
+- modify anything inside 2026-08-26_RiverTournamentClone
+- copy files from it into the new site
+- use its architecture as the foundation of the new site
+- depend on any scripts, APIs, secrets, configuration, HTML, CSS, or other resources inside it
+
+Everything for the new Civilized Pool redirect site should be created fresh in the ROOT of this repository.
+
+This new project does NOT need any external API, API key, secret, server-side code, database, Node app, framework, or scheduled GitHub Action.
+
+It should be a very small static GitHub Pages site using plain HTML/CSS/JavaScript.
+
+==================================================
+PRIMARY FUNCTION
+==================================================
+
+When somebody visits:
+
+https://civilizedpool.com
+or
+https://www.civilizedpool.com
+
+the site should determine which Thursday tournament is currently being promoted and immediately redirect the visitor to that tournament's DigitalPool overview URL.
+
+A tournament's promotion period begins at:
+
+12:00:00 AM America/Los_Angeles time on the FRIDAY immediately before the tournament
+
+and continues through:
+
+11:59:59 PM America/Los_Angeles time on the THURSDAY of the tournament.
+
+At exactly midnight Pacific time Friday morning, the redirect should change to the NEXT Thursday's tournament.
+
+This must work correctly in both PST and PDT. Do NOT hardcode a UTC offset such as UTC-7 or UTC-8.
+
+Use the IANA timezone:
+
+America/Los_Angeles
+
+All date decisions must be based on that timezone rather than the visitor's local timezone.
+
+Examples:
+
+From:
+Friday August 28, 2026 at 12:00 AM Pacific
+through:
+Thursday September 3, 2026 at 11:59:59 PM Pacific
+
+redirect to:
+
+https://digitalpool.com/tournaments/rodders-first-thursday-8-ball-932026/overview
+
+Then beginning:
+
+Friday September 4, 2026 at 12:00 AM Pacific
+
+redirect to:
+
+https://digitalpool.com/tournaments/rodders-second-thursday-9-ball-9102026/overview
+
+==================================================
+NORMAL TOURNAMENT SCHEDULE
+==================================================
+
+Rodder's tournaments occur every Thursday.
+
+The tournament format is based on which Thursday of the MONTH the tournament falls on.
+
+FIRST THURSDAY:
+8-Ball
+
+URL format:
+https://digitalpool.com/tournaments/rodders-first-thursday-8-ball-{DATE}/overview
+
+SECOND THURSDAY:
+9-Ball
+
+URL format:
+https://digitalpool.com/tournaments/rodders-second-thursday-9-ball-{DATE}/overview
+
+THIRD THURSDAY:
+Ladies Night
+
+Ladies Night alternates monthly between 8-ball and 9-ball.
+
+September 2026 = 8-ball
+October 2026 = 9-ball
+November 2026 = 8-ball
+December 2026 = 9-ball
+
+Continue that alternating sequence indefinitely in both future calculations and, if needed, earlier calculations.
+
+URL format:
+
+8-ball month:
+https://digitalpool.com/tournaments/rodders-third-thursday-ladies-night-8-ball-{DATE}/overview
+
+9-ball month:
+https://digitalpool.com/tournaments/rodders-third-thursday-ladies-night-9-ball-{DATE}/overview
+
+FOURTH THURSDAY:
+8 and 9 Ball
+
+URL format:
+https://digitalpool.com/tournaments/rodders-fourth-thursday-8-and-9-ball-{DATE}/overview
+
+FIFTH THURSDAY:
+There is NO predictable tournament format or URL.
+
+Never attempt to generate a fifth-Thursday URL.
+
+Fifth Thursdays must be supplied through the overrides file described below.
+
+==================================================
+DIGITALPOOL DATE FORMAT
+==================================================
+
+DigitalPool puts the tournament date at the end of the slug with:
+
+MONTH + DAY + FOUR-DIGIT YEAR
+
+There are NO separators and NO leading zeros.
+
+Examples:
+
+September 3, 2026:
+932026
+
+September 10, 2026:
+9102026
+
+October 1, 2026:
+1012026
+
+October 8, 2026:
+1082026
+
+October 15, 2026:
+10152026
+
+October 22, 2026:
+10222026
+
+October 29, 2026:
+10292026
+
+Create a dedicated helper function for generating this date slug rather than repeating the logic.
+
+==================================================
+KNOWN URL EXAMPLES / ACCEPTANCE DATA
+==================================================
+
+These are the first nine tournament URLs and should be used to verify that the URL-generation logic matches the actual DigitalPool naming convention:
+
+September 3, 2026:
+https://digitalpool.com/tournaments/rodders-first-thursday-8-ball-932026/overview
+
+September 10, 2026:
+https://digitalpool.com/tournaments/rodders-second-thursday-9-ball-9102026/overview
+
+September 17, 2026:
+https://digitalpool.com/tournaments/rodders-third-thursday-ladies-night-8-ball-9172026/overview
+
+September 24, 2026:
+https://digitalpool.com/tournaments/rodders-fourth-thursday-8-and-9-ball-9242026/overview
+
+October 1, 2026:
+https://digitalpool.com/tournaments/rodders-first-thursday-8-ball-1012026/overview
+
+October 8, 2026:
+https://digitalpool.com/tournaments/rodders-second-thursday-9-ball-1082026/overview
+
+October 15, 2026:
+https://digitalpool.com/tournaments/rodders-third-thursday-ladies-night-9-ball-10152026/overview
+
+October 22, 2026:
+https://digitalpool.com/tournaments/rodders-fourth-thursday-8-and-9-ball-10222026/overview
+
+October 29, 2026:
+https://digitalpool.com/tournaments/rodders-fifth-thursday-open-10-ball-10292026/overview
+
+The October 29 URL must come from the override file, NOT from generated fifth-Thursday logic.
+
+==================================================
+OVERRIDES FILE
+==================================================
+
+Create this file in the repo root:
+
+tournament-overrides.json
+
+The redirect script must check this file BEFORE using the normal recurring URL-generation rules.
+
+Use ISO date strings as keys:
+
+YYYY-MM-DD
+
+For now populate it with the known fifth Thursday:
+
+{
+  "2026-10-29": {
+    "url": "https://digitalpool.com/tournaments/rodders-fifth-thursday-open-10-ball-10292026/overview",
+    "note": "Fifth Thursday - Open 10-Ball"
+  }
+}
+
+Design the override handling so I can also use this same file later for ANY abnormal tournament date, not only fifth Thursdays.
+
+For example, I should be able to override an otherwise normal first-through-fourth Thursday URL simply by adding that tournament date to this JSON file.
+
+The redirect priority must therefore be:
+
+1. Determine the applicable tournament Thursday.
+2. Check tournament-overrides.json for that exact YYYY-MM-DD date.
+3. If an override URL exists, use it.
+4. Otherwise, if it is a first-fourth Thursday, generate the normal URL.
+5. Otherwise, fail safely.
+
+Also allow an override entry to explicitly mark a tournament as cancelled by supporting something like:
+
+{
+  "2026-12-24": {
+    "cancelled": true,
+    "note": "No tournament - Christmas Eve"
+  }
+}
+
+If cancelled is true, do NOT redirect to DigitalPool. Show the fallback page instead with an appropriate message.
+
+==================================================
+SAFE FAILURE BEHAVIOR
+==================================================
+
+Do not send users to guessed or malformed URLs.
+
+If any of the following occurs:
+
+- it is a fifth Thursday with no override
+- tournament-overrides.json cannot be loaded
+- an override entry is malformed
+- the applicable tournament is marked cancelled
+- the application cannot determine a valid tournament URL
+- unexpected JavaScript error
+
+show a simple Civilized Pool fallback page rather than redirecting.
+
+The fallback page should be mobile-friendly and say approximately:
+
+Civilized Pool
+
+Tournament link coming soon.
+
+We're getting this week's tournament signup link ready. Please check back shortly.
+
+For a cancelled tournament, it may instead say:
+
+Civilized Pool
+
+No tournament this week.
+
+[display the override note if one exists]
+
+Do not expose technical error details to normal visitors.
+
+Console logging for troubleshooting is fine.
+
+==================================================
+REDIRECT PAGE UX
+==================================================
+
+The normal page should redirect as quickly as practical.
+
+While the JavaScript is determining the URL, briefly display a clean page containing:
+
+Civilized Pool
+Finding this week's tournament...
+
+If automatic navigation does not occur but a valid tournament URL was successfully determined, provide a clickable fallback link such as:
+
+Continue to tournament signup
+
+Use:
+
+window.location.replace(...)
+
+rather than window.location.href so pressing Back is less likely to send users into a redirect loop.
+
+Do not use a meta-refresh with a hardcoded DigitalPool destination because the destination changes dynamically.
+
+==================================================
+FILES TO CREATE
+==================================================
+
+Create a clean implementation in the ROOT of this repository.
+
+At minimum I expect:
+
+index.html
+redirect.js
+tournament-overrides.json
+CNAME
+README.md
+.nojekyll
+
+You may create one small CSS file if appropriate, or keep the minimal CSS inside index.html.
+
+Do NOT create a package.json or introduce npm dependencies unless there is a genuinely necessary reason. This project should not require a build step.
+
+CNAME should contain exactly:
+
+civilizedpool.com
+
+==================================================
+CODE ORGANIZATION
+==================================================
+
+Please make redirect.js readable and maintainable.
+
+Separate the important concepts into functions rather than putting everything in one large script.
+
+Functions/concepts should include equivalents of:
+
+- getting the current date/time in America/Los_Angeles
+- determining the applicable tournament Thursday
+- formatting a date as YYYY-MM-DD
+- determining whether the Thursday is the 1st, 2nd, 3rd, 4th, or 5th Thursday
+- generating the DigitalPool M+D+YYYY date slug
+- determining whether the Ladies Night month is 8-ball or 9-ball
+- loading and validating overrides
+- generating the normal tournament URL
+- determining the final redirect target
+- displaying fallback/cancelled states
+
+Name them clearly. They do not have to use those exact function names.
+
+Avoid unnecessary complexity.
+
+==================================================
+IMPORTANT TIMEZONE REQUIREMENT
+==================================================
+
+Be especially careful here.
+
+The browser visitor may be in Oregon, Washington, another US timezone, or another country.
+
+The redirect must ALWAYS change based on the calendar date/time in:
+
+America/Los_Angeles
+
+not the user's computer timezone.
+
+The weekly period is based on Pacific calendar days:
+
+Friday 00:00:00 through Thursday 23:59:59.
+
+Please implement this robustly using browser-standard JavaScript timezone functionality such as Intl.DateTimeFormat with America/Los_Angeles.
+
+Do not determine the tournament week by first converting to the visitor's local Date components.
+
+==================================================
+TESTABILITY
+==================================================
+
+I want this logic to be easy to verify before going live.
+
+Structure the JavaScript so that the tournament URL calculation can accept an optional supplied/test Date instead of always requiring new Date() internally.
+
+Do not put a permanent testing mode into the public URL.
+
+Add a small development/test file or documented browser-console testing method that lets us verify known timestamps.
+
+At minimum verify these cases:
+
+1.
+Pacific time:
+2026-08-28 00:00
+Expected tournament:
+2026-09-03
+Expected URL:
+https://digitalpool.com/tournaments/rodders-first-thursday-8-ball-932026/overview
+
+2.
+Pacific time:
+2026-09-03 23:59
+Expected tournament:
+2026-09-03
+Expected URL:
+https://digitalpool.com/tournaments/rodders-first-thursday-8-ball-932026/overview
+
+3.
+Pacific time:
+2026-09-04 00:00
+Expected tournament:
+2026-09-10
+Expected URL:
+https://digitalpool.com/tournaments/rodders-second-thursday-9-ball-9102026/overview
+
+4.
+Pacific time:
+2026-09-11 00:00
+Expected:
+September 17 Ladies Night 8-ball
+Expected URL:
+https://digitalpool.com/tournaments/rodders-third-thursday-ladies-night-8-ball-9172026/overview
+
+5.
+Pacific time:
+2026-10-09 00:00
+Expected:
+October 15 Ladies Night 9-ball
+Expected URL:
+https://digitalpool.com/tournaments/rodders-third-thursday-ladies-night-9-ball-10152026/overview
+
+6.
+Pacific time:
+2026-10-23 00:00
+Expected tournament:
+2026-10-29
+Expected URL must come from tournament-overrides.json:
+https://digitalpool.com/tournaments/rodders-fifth-thursday-open-10-ball-10292026/overview
+
+7.
+Test a fifth Thursday with NO override.
+Expected:
+No redirect. Safe fallback page.
+
+Also test at least one date across a daylight-saving-time transition to verify the America/Los_Angeles date selection remains correct.
+
+==================================================
+README
+==================================================
+
+Create a useful README.md written for the repository owner, not for software developers generally.
+
+Explain:
+
+1. What CivilizedPool.com does.
+2. The Friday-through-Thursday redirect schedule.
+3. The normal 1st/2nd/3rd/4th Thursday URL patterns.
+4. How Ladies Night alternates monthly.
+5. How tournament-overrides.json works.
+6. EXACTLY how I add a fifth-Thursday tournament.
+7. EXACTLY how I override a normal week's DigitalPool URL.
+8. EXACTLY how I mark a tournament cancelled.
+9. How to test changes before committing.
+10. How GitHub Pages should be configured.
+11. What DNS records CivilizedPool.com and www.CivilizedPool.com will ultimately need.
+12. A warning not to place API keys or secrets anywhere in this static GitHub Pages project.
+13. A note explaining that 2026-08-26_RiverTournamentClone is reference-only and not part of the published application.
+
+Keep the README practical and concise.
+
+==================================================
+GITHUB PAGES
+==================================================
+
+Build this assuming GitHub Pages will publish directly from:
+
+Branch: main
+Folder: / (root)
+
+Do not create a GitHub Actions deployment workflow unless GitHub Pages genuinely requires one. I intend to use "Deploy from a branch".
+
+Make sure references to redirect.js, JSON, CSS, etc. work correctly when served by GitHub Pages from the repo root and from the custom domain.
+
+==================================================
+SECURITY / PRIVACY
+==================================================
+
+This is a public static site.
+
+Do not use or request any:
+- DigitalPool API keys
+- GitHub tokens
+- secrets
+- credentials
+- environment variables
+
+The redirect function requires only publicly visible tournament URLs.
+
+The existing reference folder may contain redacted placeholders. Ignore them.
+
+==================================================
+YOUR WORKFLOW
+==================================================
+
+Please do this in stages:
+
+1. First inspect the repository structure so you understand what currently exists.
+2. Confirm that you will leave 2026-08-26_RiverTournamentClone untouched.
+3. Create the new root-level files.
+4. Implement the redirect logic.
+5. Populate the October 29 override.
+6. Implement the fallback states.
+7. Implement or document the tests.
+8. Run whatever local/static tests are appropriate.
+9. Review the implementation specifically for timezone boundary bugs.
+10. Review it specifically for first/second/third/fourth/fifth Thursday calculation errors.
+11. Review it specifically against all nine known DigitalPool URLs above.
+12. Tell me which files you created.
+13. Tell me the test results.
+14. Tell me if there are any remaining steps I must perform manually in GitHub Settings or at my DNS provider.
+
+Do not modify or delete the reference folder.
+
+Start by inspecting the repo and then build the solution.
