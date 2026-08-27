@@ -14,8 +14,21 @@ if (!api) {
 }
 
 const overrides = JSON.parse(fs.readFileSync(path.join(root, 'tournament-overrides.json'), 'utf8'));
+const unexpectedUrl = 'https://digitalpool.com/tournaments/rodders-fourth-thursday-8-and-9-ball-8272026/overview';
 
 const cases = [
+  {
+    label: '2026-08-26 12:00 Pacific pre-series default',
+    now: new Date('2026-08-26T19:00:00Z'),
+    expectedDateKey: '2026-09-03',
+    expectedUrl: 'https://digitalpool.com/tournaments/rodders-first-thursday-8-ball-932026/overview',
+  },
+  {
+    label: '2026-08-27 23:59 Pacific pre-series default',
+    now: new Date('2026-08-28T06:59:00Z'),
+    expectedDateKey: '2026-09-03',
+    expectedUrl: 'https://digitalpool.com/tournaments/rodders-first-thursday-8-ball-932026/overview',
+  },
   {
     label: '2026-08-28 00:00 Pacific',
     now: new Date('2026-08-28T07:00:00Z'),
@@ -132,6 +145,10 @@ for (const testCase of cases) {
   assert(
     decision.url === testCase.expectedUrl,
     `${testCase.label}: expected url ${testCase.expectedUrl}, got ${decision.url}`,
+  );
+  assert(
+    decision.url !== unexpectedUrl,
+    `${testCase.label}: unexpected 8/27 URL was generated`,
   );
 }
 

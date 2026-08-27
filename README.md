@@ -6,6 +6,12 @@ CivilizedPool.com is a tiny GitHub Pages site that immediately sends visitors to
 
 Each tournament week runs from Friday 12:00:00 AM Pacific time through the following Thursday 11:59:59 PM Pacific time. The page always decides using `America/Los_Angeles`, so it follows Pacific calendar dates even when a visitor is elsewhere.
 
+Before Friday, August 28, 2026 at 12:00:00 AM Pacific time, the site does not show a fallback page. It always sends visitors directly to the first tournament:
+
+https://digitalpool.com/tournaments/rodders-first-thursday-8-ball-932026/overview
+
+At exactly Friday, August 28, 2026 at 12:00:00 AM Pacific time, the normal Friday-through-Thursday selection starts.
+
 The normal patterns are:
 
 - 1st Thursday: 8-Ball
@@ -24,6 +30,8 @@ The redirect script checks `tournament-overrides.json` first for the exact tourn
 Add a new date key to `tournament-overrides.json` using `YYYY-MM-DD` and provide the full DigitalPool URL.
 
 Important: this is only needed for fifth Thursdays or other special cases. The site already keeps working for future first, second, third, and fourth Thursdays without any new code or schedule updates.
+
+The runtime never generates a default fifth-Thursday URL. Without an override, fifth Thursdays fall back safely instead of guessing a DigitalPool link. The special case for the season start on Thursday, August 27, 2026 is also not generated as a tournament URL; the site uses the first tournament URL as the pre-series default redirect before August 28.
 
 Example:
 
